@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+
+<script>
+
+  //heatmap tutorial: https://d3-graph-gallery.com/graph/heatmap_tooltip.html
+
+  // set the dimensions and margins of the graph
+  var margin = {top: 30, right: 30, bottom: 30, left: 30},
+    width = 450 - margin.left - margin.right,
+    height = 450 - margin.top - margin.bottom;
+  
+  // append the svg object to the body of the page
+  var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+  
+  // Labels of row and columns
+  var myGroups = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+  var myVars = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12","13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"]
+  
+  // Build X scales and axis:
+  var x = d3.scaleBand()
+    .range([ 0, width ])
+    .domain(myGroups)
+    .padding(0.01);
+  svg.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x))
+  
+  // Build X scales and axis:
+  var y = d3.scaleBand()
+    .range([ height, 0 ])
+    .domain(myVars)
+    .padding(0.01);
+  svg.append("g")
+    .call(d3.axisLeft(y));
+  
+  // Build color scale
+  var myColor = d3.scaleLinear()
+    .range(["white", "#02a020"])
+    .domain([1,2100])
+  
+  //Read the data
+  d3.csv("https://raw.githubusercontent.com/useless-fisualization-operation/ufo-datasets/main/Data.csv", function(data) {
+  
+    //data preprocessing (get frequency)
+    var tally = {};
+    var last_Date='';
+    data.forEach(function(line) {
+        var parts = line['Date'].split(' ');
+        //console.log(parts[0]);//parts 0 has date, parts 1 has time
+        //var datetime = formatDate.parse(parts[0]);
+        //console.log(datetime);
+        //var date = formatDate(datetime).split(' ')[0];
+        var date=parts[0];
+        var month=date.split('/')[0]
+        var day=date.split('/')[1]
+        date=day+'/'+month//ignore year for now
+        //console.log(date);
+        tally[date] = (tally[date]||0) + 1;
+        last_Date=date;
+    });
+
+    var data_ref = [];
+
+    for (var date in tally) {
+        if (tally.hasOwnProperty(date)) {
+            data_ref.push({
+                month: date.split('/')[1],
+                day: date.split('/')[0],
+                frequency: tally[date]
+            });
+        }
+    }
+
+    // create a tooltip
+    var tooltip = d3.select("#my_dataviz")
+      .append("div")
+      .style("opacity", 0)
+      .attr("class", "tooltip")
+      .style("background-color", "white")
+      .style("border", "solid")
+      .style("border-width", "2px")
+      .style("border-radius", "5px")
+      .style("padding", "5px")
+  
+    // Three function that change the tooltip when user hover / move / leave a cell
+    var mouseover = function(d) {
+      tooltip.style("opacity", 1)
+    }
+    var mousemove = function(d) {
+      tooltip
+        .html("On day "+d.day+" of month "+d.month+" there were <br>" + d.frequency+" UFO sightings in total")
+        .style("left", (d3.mouse(this)[0]+70) + "px")
+        .style("top", (d3.mouse(this)[1]) + "px")
+    }
+    var mouseleave = function(d) {
+      tooltip.style("opacity", 0)
+    }
+  
+    // add the squares
+    svg.selectAll()
+      .data(data_ref, function(d) {return d.month+':'+d.day;})
+      .enter()
+      .append("rect")
+        .attr("x", function(d) { return x(d.month) })
+        .attr("y", function(d) { return y(d.day) })
+        .attr("width", x.bandwidth() )
+        .attr("height", y.bandwidth() )
+        .style("fill", function(d) { return myColor(d.frequency)} )
+      .on("mouseover", mouseover)
+      .on("mousemove", mousemove)
+      .on("mouseleave", mouseleave)
+  })
+  
+  </script>
