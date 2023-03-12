@@ -14,7 +14,7 @@ import time
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 
-df = pd.read_csv("Data.csv") # load csv in dataframe
+df = pd.read_csv("test.csv") # load csv in dataframe
 locator = Nominatim(user_agent="hope") 
 geocode = RateLimiter(locator.geocode, min_delay_seconds=0.2) # add delay to geocoding calls
 

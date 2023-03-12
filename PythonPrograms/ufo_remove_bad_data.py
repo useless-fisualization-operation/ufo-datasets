@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup, SoupStrainer# To extract specific data from html 
 import sys # Needed to increase recursion limit
 
 
-df = pd.read_csv("UfoDataWithImages.csv")
+df = pd.read_csv("Data.csv")
 df = df[df['Longitude'].notna()]
 
-df.to_csv('UfoDataWithImagesCleaned.csv', index=False)
+df.to_csv('Data2.csv', index=False)

@@ -16,7 +16,7 @@ import sys # Needed to increase recursion limit
 from concurrent.futures import ThreadPoolExecutor
 sys.setrecursionlimit(10000)
 
-df = pd.read_csv("Data.csv")
+df = pd.read_csv("Data2.csv")
 
 ''' Not currently used:'''
 def addImageAndSummary(i):
@@ -61,4 +61,4 @@ for i in range(len):
 
 pool.shutdown()
 
-df.to_csv('UfoDataWithImages.csv', index=False)
+df.to_csv('Data3.csv', index=False)
